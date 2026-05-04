@@ -1,15 +1,20 @@
+using API.Database;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
-[ApiController]
-[Route("[controller]")]
-public class WeatherForecastController : ControllerBase
+// [ApiController]
+// [Route("[controller]")]
+public class WeatherForecastController : BaseApiController
 {
     private static readonly string[] Summaries =
     [
         "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
     ];
+
+    public WeatherForecastController(DBContext context) : base(context)
+    {
+    }
 
     [HttpGet(Name = "GetWeatherForecast")]
     public IEnumerable<WeatherForecast> Get()

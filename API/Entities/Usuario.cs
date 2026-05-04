@@ -7,4 +7,8 @@ public class Usuario
     public string Id { get; set; } = Guid.NewGuid().ToString();
     public required string Nombre { get; set; }
     public required string Email { get; set; }
+    /*permite almacenar la contraseña en formato hash */
+    public required byte[] PasswordHash { get; set; }
+    /*permite almacenar la contraseña en formato hash */
+    public required byte[] passwordSalt { get; set; }
 }
