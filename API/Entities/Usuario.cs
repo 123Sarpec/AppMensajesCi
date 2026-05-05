@@ -10,5 +10,5 @@ public class Usuario
     /*permite almacenar la contraseña en formato hash */
     public required byte[] PasswordHash { get; set; }
     /*permite almacenar la contraseña en formato hash */
-    public required byte[] passwordSalt { get; set; }
+    public required byte[] PasswordSalt { get; set; }
 }

@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using API.Database;
 using API.Entities;
@@ -9,7 +8,7 @@ namespace API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]//ruta de la api 
-public class MiembrosController(DBContext context) : ControllerBase
+public class MiembrosController(DBContext context) : BaseApiController
 {
     [HttpGet] //metodo get
     public async Task<ActionResult<IEnumerable<Usuario>>> GetMiembros()

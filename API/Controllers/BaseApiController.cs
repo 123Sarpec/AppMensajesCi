@@ -8,7 +8,7 @@ namespace API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]//ruta de la api 
-public class BaseApiController(DBContext context) : ControllerBase
+public class BaseApiController : ControllerBase
 {
-    protected readonly DBContext context = context;
+    // protected readonly DBContext context = context;
 }

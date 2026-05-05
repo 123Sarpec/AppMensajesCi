@@ -12,9 +12,9 @@ public class WeatherForecastController : BaseApiController
         "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
     ];
 
-    public WeatherForecastController(DBContext context) : base(context)
-    {
-    }
+    // public WeatherForecastController(DBContext context) : base(context)
+    // {
+    // }
 
     [HttpGet(Name = "GetWeatherForecast")]
     public IEnumerable<WeatherForecast> Get()

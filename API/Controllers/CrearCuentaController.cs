@@ -1,0 +1,69 @@
+using System;
+
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
+using API.Database;
+using API.Entities;
+using System.Text;
+using API.DTOCapas;
+using Microsoft.AspNetCore.Identity.Data;
+
+
+namespace API.Controllers;
+
+
+[ApiController]
+[Route("api/[controller]")]//ruta de la api 
+public class CrearCuentaController(DBContext context) : BaseApiController
+{
+    [HttpPost("registrar")]
+    public async Task<ActionResult<Usuario>> CrearCuenta(RegistratCuenta registrocuenta)
+    {
+        /*verificar que el correo no exista*/
+        if (await VerificarCorreo(registrocuenta.Email)) return BadRequest("El correo ya existe");
+
+        using var hmac = new HMACSHA512();
+        var usuario = new Usuario
+        {
+            Nombre = registrocuenta.Nombre,
+            Email = registrocuenta.Email,
+            PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(registrocuenta.Password)),
+            PasswordSalt = hmac.Key
+            // };
+            //     Email = email,
+            //     PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password)),
+            //     PasswordSalt = hmac.Key
+
+        };
+        /*AGREGAR EL NUEVO USUARIO*/
+        context.Usuarios.Add(usuario);
+        await context.SaveChangesAsync();
+
+        return usuario;
+    }
+
+    /*CREAR EL METOOD PARA INICIAR SESION EL USUAIRO */
+    [HttpPost("login")]
+    public async Task<ActionResult<Usuario>> IniciarSesion(IniciarSesion iniciarsesion)
+    {
+        var usuario = await context.Usuarios.SingleOrDefaultAsync(x => x.Email == iniciarsesion.Email);
+        if (usuario == null) return BadRequest(new { mensaje = "El correo no es valido" });
+
+        /*HASHEAR LA CONTRASEÑA QUE SE ALMACENA EN LA LA BASE DE DATOS PARA CAPUTAR EN EL PASSWOERSALT*/
+        using var hmac = new HMACSHA512(usuario.PasswordSalt);
+        var passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(iniciarsesion.Password));
+
+        /*DEFINIR UN BUCLE PARA COMPARAR LA CONTRASEÑA*/
+        for (var i = 0; i < passwordHash.Length; i++)
+        {
+            if (passwordHash[i] != usuario.PasswordHash[i]) return BadRequest(new { mensaje = "Contraseña incorrecta" });
+        }
+        return usuario;
+    }
+    /*VERIFICAR QUE EL CORREO NO EXISTA*/
+    private async Task<bool> VerificarCorreo(string email)
+    {
+        return await context.Usuarios.AnyAsync(x => x.Email.ToLower() == email.ToLower());
+    }
+}
