@@ -1,6 +1,8 @@
 
 using API.Database;
 using Microsoft.EntityFrameworkCore;
+using API.Interfaces;
+using API.Servicios;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +17,8 @@ builder.Services.AddDbContext<DBContext>(opt =>
 });
 
 builder.Services.AddCors();
+builder.Services.AddScoped<TokenServicio, TokenServicios>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
