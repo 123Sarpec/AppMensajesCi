@@ -8,7 +8,9 @@ public class Usuario
     public required string Nombre { get; set; }
     public required string Email { get; set; }
     /*permite almacenar la contraseña en formato hash */
+    public string? ImagenUrl { get; set; }
     public required byte[] PasswordHash { get; set; }
     /*permite almacenar la contraseña en formato hash */
     public required byte[] PasswordSalt { get; set; }
+
 }

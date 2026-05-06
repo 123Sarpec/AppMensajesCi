@@ -7,7 +7,7 @@ using API.Database;
 using API.Entities;
 using System.Text;
 using API.DTOCapas;
-using Microsoft.AspNetCore.Identity.Data;
+using API.Interfaces;
 
 
 namespace API.Controllers;
@@ -15,10 +15,10 @@ namespace API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]//ruta de la api 
-public class CrearCuentaController(DBContext context) : BaseApiController
+public class CrearCuentaController(DBContext context, TokenServicio tokenServicios) : BaseApiController
 {
     [HttpPost("registrar")]
-    public async Task<ActionResult<Usuario>> CrearCuenta(RegistratCuenta registrocuenta)
+    public async Task<ActionResult<UsuariosSesion>> CrearCuenta(RegistratCuenta registrocuenta)
     {
         /*verificar que el correo no exista*/
         if (await VerificarCorreo(registrocuenta.Email)) return BadRequest("El correo ya existe");
@@ -40,7 +40,14 @@ public class CrearCuentaController(DBContext context) : BaseApiController
         context.Usuarios.Add(usuario);
         await context.SaveChangesAsync();
 
-        return usuario;
+        return new UsuariosSesion
+        {
+            Id = usuario.Id,
+            Email = usuario.Email,
+            Nomre = usuario.Nombre,
+            Token = tokenServicios.CreateToken(usuario)
+            // ImagenUrl = usuario.ImagenUrl
+        };
     }
 
     /*CREAR EL METOOD PARA INICIAR SESION EL USUAIRO */

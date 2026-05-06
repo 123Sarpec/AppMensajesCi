@@ -3,6 +3,9 @@ using API.Database;
 using Microsoft.EntityFrameworkCore;
 using API.Interfaces;
 using API.Servicios;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +21,17 @@ builder.Services.AddDbContext<DBContext>(opt =>
 
 builder.Services.AddCors();
 builder.Services.AddScoped<TokenServicio, TokenServicios>();
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+{
+    var TokenKey = builder.Configuration["TokenKey"] ?? throw new Exception("TokenKey no encontrado");
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(TokenKey)),
+        ValidateIssuer = false,
+        ValidateAudience = false
+    };
+});
 
 var app = builder.Build();
 
