@@ -45,6 +45,11 @@ var app = builder.Build();
 app.UseCors(x => x.AllowAnyMethod().AllowAnyHeader().WithOrigins("http://localhost:4200", "https://localhost:4200"));
 // app.UseAuthorization();
 
+// especificar la autenticación
+app.UseAuthentication();
+// autoriazar el tocker de la base de datos
+app.UseAuthorization();
+
 app.MapControllers();
 
 app.Run();

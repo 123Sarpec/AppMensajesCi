@@ -8,6 +8,7 @@ using API.Entities;
 using System.Text;
 using API.DTOCapas;
 using API.Interfaces;
+using API.Extension;
 
 
 namespace API.Controllers;
@@ -40,33 +41,46 @@ public class CrearCuentaController(DBContext context, TokenServicio tokenServici
         context.Usuarios.Add(usuario);
         await context.SaveChangesAsync();
 
-        return new UsuariosSesion
-        {
-            Id = usuario.Id,
-            Email = usuario.Email,
-            Nomre = usuario.Nombre,
-            Token = tokenServicios.CreateToken(usuario)
-            // ImagenUrl = usuario.ImagenUrl
-        };
+        // return new UsuariosSesion
+        // {
+        //     Id = usuario.Id,
+        //     Email = usuario.Email,
+        //     Nomre = usuario.Nombre,
+        //     Token = tokenServicios.CreateToken(usuario)
+        //     // ImagenUrl = usuario.ImagenUrl
+        // };
+        return usuario.ToIniciarSesion(tokenServicios);
     }
 
     /*CREAR EL METOOD PARA INICIAR SESION EL USUAIRO */
     [HttpPost("login")]
-    public async Task<ActionResult<Usuario>> IniciarSesion(IniciarSesion iniciarsesion)
+    public async Task<ActionResult<UsuariosSesion>> IniciarSesion(IniciarSesion iniciarsesion)
     {
-        var usuario = await context.Usuarios.SingleOrDefaultAsync(x => x.Email == iniciarsesion.Email);
-        if (usuario == null) return BadRequest(new { mensaje = "El correo no es valido" });
+        var usuario = await context.Usuarios
+            .SingleOrDefaultAsync(x => x.Email == iniciarsesion.Email);
 
-        /*HASHEAR LA CONTRASEÑA QUE SE ALMACENA EN LA LA BASE DE DATOS PARA CAPUTAR EN EL PASSWOERSALT*/
+        if (usuario == null)
+            return BadRequest(new { mensaje = "El correo no es valido" });
+
         using var hmac = new HMACSHA512(usuario.PasswordSalt);
-        var passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(iniciarsesion.Password));
 
-        /*DEFINIR UN BUCLE PARA COMPARAR LA CONTRASEÑA*/
+        var passwordHash = hmac.ComputeHash(
+            Encoding.UTF8.GetBytes(iniciarsesion.Password));
+
         for (var i = 0; i < passwordHash.Length; i++)
         {
-            if (passwordHash[i] != usuario.PasswordHash[i]) return BadRequest(new { mensaje = "Contraseña incorrecta" });
+            if (passwordHash[i] != usuario.PasswordHash[i])
+                return BadRequest(new { mensaje = "Contraseña incorrecta" });
         }
-        return usuario;
+
+        // return new UsuariosSesion
+        // {
+        //     Id = usuario.Id,
+        //     Email = usuario.Email,
+        //     Nomre = usuario.Nombre,
+        //     Token = tokenServicios.CreateToken(usuario)
+        // };
+        return usuario.ToIniciarSesion(tokenServicios);
     }
     /*VERIFICAR QUE EL CORREO NO EXISTA*/
     private async Task<bool> VerificarCorreo(string email)
