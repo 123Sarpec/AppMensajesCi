@@ -14,7 +14,7 @@ public static class ExtensionUsuario
         {
             Id = usuario.Id,
             Email = usuario.Email,
-            Nomre = usuario.Nombre,
+            Nombre = usuario.Nombre,
             Token = tokenServicios.CreateToken(usuario)
         };
     }
